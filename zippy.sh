@@ -1,4 +1,11 @@
-#!/bin/sh
+#!/bin/bash
+# @Description: zippyshare.com file batch download script
+# @Author: Live2x
+# @URL: live2x.com
+# @Version: 1.0
+# @Date: 2014/10/27
+# @Usage: sh zippy.sh filelist.txt
+
 if [ -s filelist.txt ]; then
 
     i=1
