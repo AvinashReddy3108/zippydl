@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: live2x.com
-# @Version: 1.0
-# @Date: 2014/09/16
+# @Version: 1.0.20141027
+# @Date: 2014/10/27
 # @Usage: sh zippyshare.sh filename
 
 
@@ -32,8 +32,9 @@ fi
 
 if [ -f "info.txt" ]; then
     #a=`cat info.txt | grep "var a =" | cut -d'=' -f2 | cut -d';' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*"`
-    a=`cat info.txt | grep "var a =" | cut -d'=' -f2 | cut -d';' -f1 | cut -d'%' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*"`
-    #echo "a="$a
+    x1=`cat info.txt | grep "var a =" | cut -d'=' -f2 | cut -d';' -f1 | cut -d'%' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*"`
+    x2=`cat info.txt | grep "var a =" | cut -d'=' -f2 | cut -d';' -f1 | cut -d'%' -f2 | grep -o "[^ ]\+\(\+[^ ]\+\)*"`
+    #echo "a="$x1%$x2
 
     #filename=`cat info.txt | grep "property=\"og:title\"" | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*"`
     filename=`cat info.txt | grep "b+18" | head -n 1 | cut -d'/' -f5 | cut -d'"' -f1`
@@ -55,19 +56,18 @@ else
     exit
 fi
 
-x1=3
-x2=19
-x3=1235
 
-x=$[(a%x1)*(a%x3)+x2]
+a=$[(x1%x2)]
+#echo "a="$a
+
+x=`cat info.txt | grep "/d/" | cut -d'/' -f4 | cut -d'+' -f2 | cut -d'+' -f1`
 #echo "x="$x
+if [ $x != "a" ]; then
+  echo -e "\033[31m Zippyshare.com algorithm changed, please update script! \033[0m"
+  exit
+fi 
 
-if [ $x -eq 18 ]; then
-    x=`cat info.txt | grep "/d/" | cut -d'/' -f4 | cut -d'(' -f2 | cut -d')' -f1`
-    x=$[x]
-fi
-
-dl="http://"$server"/d/"$id"/"$x"/"$filename
+dl="http://"$server"/d/"$id"/"$a"/"$filename
 #echo $dl
 
 agent="Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
