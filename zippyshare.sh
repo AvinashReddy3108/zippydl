@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: live2x.com
-# @Version: 1.0.20141027
-# @Date: 2014/10/27
+# @Version: 1.0.20141117
+# @Date: 2014/11/17
 # @Usage: sh zippyshare.sh filename
 
 
@@ -56,15 +56,21 @@ else
     exit
 fi
 
-
-a=$[(x1%x2)]
+if [ $x1 == $x2 ]; then
+  a=$[(x1+3)]
+  x1=`cat info.txt | grep $a | head -n 1 | cut -d'%' -f2 | cut -d';' -f1`
+  b=$[(a%x1)*(a%3)]
+else
+  a=$[(x1%x2)]
+fi
 #echo "a="$a
 
-x=`cat info.txt | grep "/d/" | cut -d'/' -f4 | cut -d'+' -f2 | cut -d'+' -f1`
-#echo "x="$x
-if [ $x != "a" ]; then
-  echo -e "\033[31m Zippyshare.com algorithm changed, please update script! \033[0m"
-  exit
+x=`cat info.txt | grep "/d/" | head -n 1 | cut -d'/' -f4 | cut -d'+' -f2 | cut -d'+' -f1`
+if [ "$x" != "a" ]; then
+  x=`cat info.txt | grep "/d/" | head -n 1 | cut -d'/' -f4 | cut -d'+' -f2-3`
+  a=$[x-1]
+  #echo -e "\033[31m Zippyshare.com algorithm changed, please update script! \033[0m"
+  #exit
 fi 
 
 dl="http://"$server"/d/"$id"/"$a"/"$filename
