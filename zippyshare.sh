@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: live2x.com
-# @Version: 1.0.20141117
-# @Date: 2014/11/17
+# @Version: 1.0.20150120
+# @Date: 2015/01/20
 # @Usage: sh zippyshare.sh filename
 
 
@@ -57,9 +57,11 @@ else
 fi
 
 if [ $x1 == $x2 ]; then
-  a=$[(x1+3)]
-  x1=`cat info.txt | grep $a | head -n 1 | cut -d'%' -f2 | cut -d';' -f1`
-  b=$[(a%x1)*(a%3)]
+  if [ ! -z $x1 ]; then
+    a=$[(x1+3)]
+    x1=`cat info.txt | grep $a | head -n 1 | cut -d'%' -f2 | cut -d';' -f1`
+    b=$[(a%x1)*(a%3)]
+  fi
 else
   a=$[(x1%x2)]
 fi
@@ -68,7 +70,8 @@ fi
 x=`cat info.txt | grep "/d/" | head -n 1 | cut -d'/' -f4 | cut -d'+' -f2 | cut -d'+' -f1`
 if [ "$x" != "a" ]; then
   x=`cat info.txt | grep "/d/" | head -n 1 | cut -d'/' -f4 | cut -d'+' -f2-3`
-  a=$[x-1]
+  a=$[x]
+  #a=$[x-1]
   #echo -e "\033[31m Zippyshare.com algorithm changed, please update script! \033[0m"
   #exit
 fi 
