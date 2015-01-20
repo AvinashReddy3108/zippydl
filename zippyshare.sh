@@ -57,7 +57,7 @@ else
 fi
 
 if [ $x1 == $x2 ]; then
-  if [ ! -z $x1 ]; then
+  if [ $x1 -gt 0 ]; then
     a=$[(x1+3)]
     x1=`cat info.txt | grep $a | head -n 1 | cut -d'%' -f2 | cut -d';' -f1`
     b=$[(a%x1)*(a%3)]
