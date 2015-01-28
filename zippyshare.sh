@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: live2x.com
-# @Version: 1.0.20150120
-# @Date: 2015/01/20
+# @Version: 1.0.20150128
+# @Date: 2015/01/28
 # @Usage: sh zippyshare.sh filename
 
 
@@ -56,7 +56,7 @@ else
     exit
 fi
 
-if [ $x1 == $x2 ]; then
+if [ "$x1" == "$x2" ]; then
   if [ $x1 -gt 0 ]; then
     a=$[(x1+3)]
     x1=`cat info.txt | grep $a | head -n 1 | cut -d'%' -f2 | cut -d';' -f1`
