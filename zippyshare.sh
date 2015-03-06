@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: live2x.com
-# @Version: 1.0.20150216
-# @Date: 2015/02/16
+# @Version: 1.0.20150307
+# @Date: 2015/03/07
 # @Usage: sh zippyshare.sh filename
 
 if [ -z "$1" ]; then
@@ -32,52 +32,63 @@ fi
 
 if [ -f "info.txt" ]; then
     # Get url algorithm
-    a=`cat info.txt | grep "/d/" | head -n 1 | cut -d'/' -f4 | cut -d'(' -f2 | cut -d')' -f1`
+    algorithm=`cat info.txt | grep -E "dlbutton(.*)\/d\/(.*)rar" | head -n 1 | cut -d'/' -f4 | cut -d'(' -f2 | cut -d')' -f1`
 
-    # Variables string to array
-    read -a arr <<<$a
+    a=`cat info.txt | grep "var a =" | head -n 1 | cut -d'=' -f2 | cut -d';' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*"`
 
-    # Get variable array
-    for ((i=0;i<${#arr[@]};i+=2))
-    do
-      param[(i/2)]=${arr[i]}
-    done
+    if [[ $a != *[!0-9]* ]]; then
+      x=$((a+3))
+      p=`cat info.txt | grep "$x" | head -n 1 | cut -d'%' -f2 | cut -d';' -f1`
+      b=$(((x%p)*(x%3)))
+      a=$((algorithm))
+    else
+      # Variables string to array
+      read -a ar <<<$algorithm
 
-    # Number of variable 
-    #echo ${#param[@]}
+      # Get variable array
+      for ((i=0;i<${#arr[@]};i+=2))
+      do
+        param[(i/2)]=${arr[i]}
+      done
 
-    for ((i=0;i<${#param[@]};i++))
-    do
+      # Number of variable 
+      #echo ${#param[@]}
 
-      if [[ ${param[i]} != *[!0-9]* ]]; then
-	x = ${param[i]}
-      else
-        if [[ $i < 3 ]]; then
-          x=`cat info.txt | grep "var ${param[i]} =" | head -n 1 | cut -d'=' -f2 | cut -d';' -f1`
+      for ((i=0;i<${#param[@]};i++))
+      do
+
+        if [[ ${param[i]} != *[!0-9]* ]]; then
+	  x = ${param[i]}
+
         else
-          x=`cat info.txt | grep "var ${param[i]} =" | tail -n 1 | cut -d'=' -f2 | cut -d';' -f1`
+          if [[ $i < 3 ]]; then
+            x=`cat info.txt | grep "var ${param[i]} =" | head -n 1 | cut -d'=' -f2 | cut -d';' -f1`
+          else
+            x=`cat info.txt | grep "var ${param[i]} =" | tail -n 1 | cut -d'=' -f2 | cut -d';' -f1`
+          fi
         fi
-      fi
 
-      if [[ $x != *[!0-9]* ]]; then
-	vi[i]=$x
-      else
-        v[i]=$((x))
-      fi
-    done
+        if [[ $x != *[!0-9]* ]]; then
+	  vi[i]=$x
+        else
+          v[i]=$((x))
+        fi
+      done
 
-    ret=${v[0]}
+      ret=${v[0]}
 
-    for ((i=0;i<${#param[@]};i+=1))
-    do
-      ret="$ret${arr[2*i+1]}${v[i+1]}"
-    done
+      for ((i=0;i<${#param[@]};i+=1))
+      do
+        ret="$ret${arr[2*i+1]}${v[i+1]}"
+      done
 
-    a=$((ret))
+      a=$((ret))
+    fi
+
     #echo "a="$a
 
     # Get server, filename, id, reffer
-    filename=`cat info.txt | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1`
+    filename=`cat info.txt | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*"`
     #echo "filename="$filename
     
     reffer=`cat info.txt | grep "property=\"og:url\"" | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*"`
