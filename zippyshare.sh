@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: live2x.com
-# @Version: 1.0.20150307
-# @Date: 2015/03/07
+# @Version: 1.0.20150709
+# @Date: 2015/07/09
 # @Usage: sh zippyshare.sh filename
 
 if [ -z "$1" ]; then
@@ -12,19 +12,19 @@ if [ -z "$1" ]; then
 fi
 
 if [ -f "$1" ]; then
-  rm -rf $1
+  rm -f $1
 fi
 
 if [ -f "cookie.txt" ]; then
-  rm -rf cookie.txt
+  rm -f cookie.txt
 fi
 
 wget -O info.txt $1 --cookies=on --keep-session-cookies --save-cookies=cookie.txt --quiet
 
 # Get cookie
 if [ -f "cookie.txt" ]; then 
-    jsessionid=`cat cookie.txt | grep "JSESSIONID" | cut -f7`
-    #echo "JSESSIONID="$jsessionid
+    jsessionid=$(cat cookie.txt | grep "JSESSIONID" | cut -f7)
+    #echo "JSESSIONID => "$jsessionid
 else
     echo "can't find cookie file"
     exit
@@ -32,18 +32,22 @@ fi
 
 if [ -f "info.txt" ]; then
     # Get url algorithm
-    algorithm=`cat info.txt | grep -E "dlbutton(.*)\/d\/(.*)rar" | head -n 1 | cut -d'/' -f4 | cut -d'(' -f2 | cut -d')' -f1`
+    algorithm=$(cat info.txt | grep -E "dlbutton(.*)\/d\/(.*)" | head -n 1 | cut -d'/' -f4 | cut -d'(' -f2 | cut -d')' -f1)
+    #echo "algorithm => "$algorithm
 
-    a=`cat info.txt | grep "var a =" | head -n 1 | cut -d'=' -f2 | cut -d';' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*"`
+    a=$(cat info.txt | grep "var a =" | head -n 1 | cut -d'=' -f2 | cut -d';' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*")
+    #echo "a => "$a
 
     if [[ $a != *[!0-9]* ]]; then
-      x=$((a+3))
-      p=`cat info.txt | grep "$x" | head -n 1 | cut -d'%' -f2 | cut -d';' -f1`
-      b=$(((x%p)*(x%3)))
+      # $a is a digit
+      b=$(cat info.txt | grep "var b =" | head -n 1 | cut -d'=' -f2 | cut -d';' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*")
+      a=$((a/3))
       a=$((algorithm))
     else
       # Variables string to array
-      read -a ar <<<$algorithm
+      IFS=+ read  ar <<<$algorithm
+      IFS=* read  ar1 <<<$ar
+      read -a arr <<<$ar1
 
       # Get variable array
       for ((i=0;i<${#arr[@]};i+=2))
@@ -62,9 +66,9 @@ if [ -f "info.txt" ]; then
 
         else
           if [[ $i < 3 ]]; then
-            x=`cat info.txt | grep "var ${param[i]} =" | head -n 1 | cut -d'=' -f2 | cut -d';' -f1`
+            x=$(cat info.txt | grep "var ${param[i]} =" | head -n 1 | cut -d'=' -f2 | cut -d';' -f1)
           else
-            x=`cat info.txt | grep "var ${param[i]} =" | tail -n 1 | cut -d'=' -f2 | cut -d';' -f1`
+            x=$(cat info.txt | grep "var ${param[i]} =" | tail -n 1 | cut -d'=' -f2 | cut -d';' -f1)
           fi
         fi
 
@@ -88,17 +92,17 @@ if [ -f "info.txt" ]; then
     #echo "a="$a
 
     # Get server, filename, id, reffer
-    filename=`cat info.txt | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*"`
-    #echo "filename="$filename
+    filename=$(cat info.txt | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*")
+    #echo "filename => "$filename
     
-    reffer=`cat info.txt | grep "property=\"og:url\"" | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*"`
-    #echo "reffer="$reffer
+    reffer=$(cat info.txt | grep "property=\"og:url\"" | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*")
+    #echo "reffer => "$reffer
 
     server=`echo "$reffer" | cut -d'/' -f3`
-    #echo "server="$server
+    #echo "server => "$server
 
     id=`echo "$reffer" | cut -d'/' -f5`
-    #echo "id="$id
+    #echo "id => "$id
 else
     echo "can't find info file"
     exit
@@ -107,7 +111,7 @@ fi
 if [[ $a != *[!0-9]* ]]; then
   # Build download url
   dl="http://"$server"/d/"$id"/"$a"/"$filename
-  #echo $dl
+  #echo "url => "$dl
 
   # Set brower agent
   agent="Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
@@ -127,7 +131,7 @@ if [[ $a != *[!0-9]* ]]; then
   if [[ -s $filename ]]; then
     echo -e "\033[32m Download success! \033[0m"
   else
-    rm -rf ${filename}
+    rm -f ${filename}
     echo -e "\033[31m Download error! \033[0m"
   fi
 else
@@ -135,5 +139,5 @@ else
   echo -e "\033[31m Zippyshare.com algorithm changed, please update script! \033[0m"
 fi
 
-rm -rf cookie.txt
-rm -rf info.txt
+rm -f cookie.txt
+rm -f info.txt
