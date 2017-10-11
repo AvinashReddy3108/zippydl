@@ -2,7 +2,7 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: live2x.com
-# @Version: 1.0.201710111009
+# @Version: 1.0.201710111033
 # @Date: 2017/10/11
 # @Usage: sh zippyshare.sh url
 
@@ -19,7 +19,7 @@ function zippydownload()
       rm -f cookie.txt
     fi
 
-    wget -O info.txt $1 \
+    wget -O info.txt "${url}" \
     --cookies=on \
     --keep-session-cookies \
     --save-cookies=cookie.txt \
@@ -66,20 +66,11 @@ function zippydownload()
     agent="Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
 
 # Start download file
-    echo -ne "\033[33m $filename download start...      \033[0m"
     wget -c -O $filename $dl \
     -q --show-progress \
     --referer='$reffer' \
     --cookies=off --header "Cookie: JSESSIONID=$jsessionid" \
     --user-agent='$agent'
-    echo -e "[\033[32m Done \033[0m]"
-
-    if [[ -s $filename ]]; then
-        echo -e "\033[32m Download success! \033[0m"
-    else
-        rm -f ${filename}
-        echo -e "\033[31m Download error! \033[0m"
-    fi
 
     rm -f cookie.txt
     rm -f info.txt
@@ -87,7 +78,7 @@ function zippydownload()
 
 if [ -f "$1" ]
 then
-    for line in $(cat "$1" | grep zippyshare\.com ); do zippydownload "${line}"; done
+    for url in $(cat "${1}" | grep 'zippyshare.com' ); do zippydownload "${url}"; done
 else
     zippydownload "${1}"
 fi
