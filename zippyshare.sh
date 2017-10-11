@@ -1,7 +1,7 @@
 #!/bin/bash
 # @Description: zippyshare.com file download script
 # @Author: Live2x
-# @URL: live2x.com
+# @URL: https://github.com/img2tab/zippyshare
 # @Version: 1.0.201710111033
 # @Date: 2017/10/11
 # @Usage: sh zippyshare.sh url
