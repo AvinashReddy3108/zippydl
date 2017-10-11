@@ -1,7 +1,6 @@
-zippyshare
+zippyshare.sh - a bash script for downloading zippyshare files
 ==========
 
-zippyshare download bash file.
 
 Download single file from zippyshare:
 
