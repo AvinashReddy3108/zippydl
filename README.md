@@ -13,4 +13,4 @@ Example:
 
     sh zippyshare.sh http://www12.zippyshare.com/v/3456789/file.html  
 
-zippyshare.sh uses wget with the `--continue` flag which may resume a partially downloaded file. When batch-downloading, wget will simply skip over completed files.
+zippyshare.sh uses wget with the `--continue` flag which may resume a partially downloaded file. When batch-downloading, wget will skip over completed files, and attempt to resume partially downloaded files.
