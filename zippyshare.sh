@@ -2,7 +2,7 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: live2x.com
-# @Version: 1.0.20171011
+# @Version: 1.0.201710111000
 # @Date: 2017/10/11
 # @Usage: sh zippyshare.sh filename
 
@@ -64,13 +64,10 @@ agent="Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko
 # Start download file
 echo -ne "\033[33m $filename download start...      \033[0m"
 wget -c -O $filename $dl \
+-q --show-progress \
 --referer='$reffer' \
 --cookies=off --header "Cookie: JSESSIONID=$jsessionid" \
---user-agent='$agent' \
---progress=dot \
-2>&1 \
-| grep --line-buffered "%" | sed -u -e "s,\.,,g" | awk '{printf("\b\b\b\b\b\b\b[\033[36m%4s\033[0m ]", $2)}'
-echo -ne "\b\b\b\b\b\b\b"
+--user-agent='$agent'
 echo -e "[\033[32m Done \033[0m]"
 
 if [[ -s $filename ]]; then
