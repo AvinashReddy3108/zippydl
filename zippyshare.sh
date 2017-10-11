@@ -2,7 +2,7 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: https://github.com/img2tab/zippyshare
-# @Version: 1.0.201710111127
+# @Version: 1.0.201710111133
 # @Date: 2017/10/11
 # @Usage: sh zippyshare.sh url
 
@@ -16,8 +16,8 @@ fi
 function zippydownload()
 {
     prefix="$( echo -n "${url}" | cut -c "11,12,31-38" | sed -e 's/[^A-z0-9]//g' )"
-    cookiefile="${prefix}-cookie.txt"
-    infofile="${prefix}-info.txt"
+    cookiefile="${prefix}-cookie.tmp"
+    infofile="${prefix}-info.tmp"
 
     if [ -f "${cookiefile}" ]; then
       rm -f "${cookiefile}"
@@ -33,7 +33,7 @@ function zippydownload()
     if [ -f "${cookiefile}" ]; then 
         jsessionid="$( cat "${cookiefile}" | grep "JSESSIONID" | cut -f7)"
     else
-        echo "can't find cookie file"
+        echo "can't find cookie file for ${prefix}"
         exit
     fi
 
@@ -52,7 +52,7 @@ function zippydownload()
 
         id="$( echo "${ref}" | cut -d'/' -f5 )"
     else
-        echo "can't find info file"
+        echo "can't find info file for ${prefix}"
         exit
     fi
 
