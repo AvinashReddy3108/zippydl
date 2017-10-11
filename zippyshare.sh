@@ -2,11 +2,12 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: https://github.com/img2tab/zippyshare
-# @Version: 1.0.201710111133
+# @Version: 1.1.201710111346
 # @Date: 2017/10/11
 # @Usage: sh zippyshare.sh url
 
-if [ -z "${1}" ]; then
+if [ -z "${1}" ]
+then
     echo "usage: ${0} url"
     echo "batch usage: ${0} url-list.txt"
     echo "url-list.txt is a file that contains one zippyshare.com url per line"
@@ -19,8 +20,9 @@ function zippydownload()
     cookiefile="${prefix}-cookie.tmp"
     infofile="${prefix}-info.tmp"
 
-    if [ -f "${cookiefile}" ]; then
-      rm -f "${cookiefile}"
+    if [ -f "${cookiefile}" ]
+    then
+        rm -f "${cookiefile}"
     fi
 
     wget -O "${infofile}" "${url}" \
@@ -30,14 +32,16 @@ function zippydownload()
     --quiet
 
     # Get cookie
-    if [ -f "${cookiefile}" ]; then 
+    if [ -f "${cookiefile}" ]
+    then 
         jsessionid="$( cat "${cookiefile}" | grep "JSESSIONID" | cut -f7)"
     else
         echo "can't find cookie file for ${prefix}"
         exit
     fi
 
-    if [ -f "${infofile}" ]; then
+    if [ -f "${infofile}" ]
+    then
         # Get url algorithm
         algorithm="$( cat "${infofile}" | grep -E "dlbutton(.*)\/d\/(.*)" | head -n 1 | cut -d'/' -f4 | cut -d'(' -f2 | cut -d')' -f1 )"
 
@@ -75,7 +79,10 @@ function zippydownload()
 
 if [ -f "${1}" ]
 then
-    for url in $( cat "${1}" | grep 'zippyshare.com' ); do zippydownload "${url}"; done
+    for url in $( cat "${1}" | grep 'zippyshare.com' )
+    do
+        zippydownload "${url}"
+    done
 else
     url="${1}"
     zippydownload "${url}"
