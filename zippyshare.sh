@@ -2,7 +2,7 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: https://github.com/img2tab/zippyshare
-# @Version: 1.1.201710111346
+# @Version: 1.1.201710111904
 # @Date: 2017/10/11
 # @Usage: sh zippyshare.sh url
 
@@ -20,16 +20,27 @@ function zippydownload()
     cookiefile="${prefix}-cookie.tmp"
     infofile="${prefix}-info.tmp"
 
-    if [ -f "${cookiefile}" ]
-    then
-        rm -f "${cookiefile}"
-    fi
+    # loop that makes sure the script actually finds a filename
+    filename=""
+    retry=0
+    while [ -z "${filename}" -a ${retry} -lt 10 ]
+    do
+        let retry+=1
+        rm -f "${cookiefile}" 2> /dev/null
+        rm -f "${infofile}" 2> /dev/null
+        wget -O "${infofile}" "${url}" \
+        --cookies=on \
+        --keep-session-cookies \
+        --save-cookies="${cookiefile}" \
+        --quiet
+        filename="$( cat "${infofile}" | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
+    done
 
-    wget -O "${infofile}" "${url}" \
-    --cookies=on \
-    --keep-session-cookies \
-    --save-cookies="${cookiefile}" \
-    --quiet
+    if [ "${retry}" -ge 10 ]
+    then
+        echo "could not download file"
+        exit
+    fi
 
     # Get cookie
     if [ -f "${cookiefile}" ]
@@ -47,9 +58,7 @@ function zippydownload()
 
         a="$( echo $(( ${algorithm} )) )"
 
-        # Get server, filename, id, ref
-        filename="$( cat "${infofile}" | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
-        
+        # Get ref, server, id
         ref="$( cat "${infofile}" | grep 'property="og:url"' | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
 
         server="$( echo "${ref}" | cut -d'/' -f3 )"
@@ -66,6 +75,8 @@ function zippydownload()
     # Set brower agent
     agent="Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
 
+    echo "${filename}"
+
     # Start download file
     wget -c -O "${filename}" "${dl}" \
     -q --show-progress \
@@ -73,13 +84,13 @@ function zippydownload()
     --cookies=off --header "Cookie: JSESSIONID=${jsessionid}" \
     --user-agent="${agent}"
 
-    rm -f "${cookiefile}"
-    rm -f "${infofile}"
+    rm -f "${cookiefile}" 2> /dev/null
+    rm -f "${infofile}" 2> /dev/null
 }
 
 if [ -f "${1}" ]
 then
-    for url in $( cat "${1}" | grep 'zippyshare.com' )
+    for url in $( cat "${1}" | grep -i 'zippyshare.com' )
     do
         zippydownload "${url}"
     done
