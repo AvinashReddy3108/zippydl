@@ -7,9 +7,9 @@ Download single file from zippyshare:
 
 sh zippyshare.sh url
 
-Example:  
-sh zippyshare.sh http://www16.zippyshare.com/v/7230160/file.html
+Download files from URL list:
 
-Batch download URLs from zippyshare:  
-Add URLs to filelist.txt, one url per line.  
-sh zippyshare.sh filelist.txt  
+sh zippyshare.sh url-list.txt     # url-list.txt must contain one url per line
+
+Example:  
+sh zippyshare.sh http://www12.zippyshare.com/v/3456789/file.html  
