@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: https://github.com/img2tab/zippyshare
-# @Version: 1.1.201710111904
-# @Date: 2017/10/11
+# @Version: 1.1.201710270001
+# @Date: 2017-10-27
 # @Usage: sh zippyshare.sh url
 
 if [ -z "${1}" ]
@@ -54,7 +54,7 @@ function zippydownload()
     if [ -f "${infofile}" ]
     then
         # Get url algorithm
-        algorithm="$( cat "${infofile}" | grep -E "dlbutton(.*)\/d\/(.*)" | head -n 1 | cut -d'/' -f4 | cut -d'(' -f2 | cut -d')' -f1 )"
+        algorithm="$( cat "${infofile}" | grep -E 'var a = [0-9][^;]*' | grep -o '[0-9][^;]*')"
 
         a="$( echo $(( ${algorithm} )) )"
 
