@@ -16,7 +16,7 @@ fi
 
 function zippydownload()
 {
-    prefix="$( echo -n "${url}" | cut -c "11,12,31-38" | sed -e 's/[^A-z0-9]//g' )"
+    prefix="$( echo -n "${url}" | cut -c "11,12,31-38" | sed -e 's/[^a-zA-Z0-9]//g' )"
     cookiefile="${prefix}-cookie.tmp"
     infofile="${prefix}-info.tmp"
 
