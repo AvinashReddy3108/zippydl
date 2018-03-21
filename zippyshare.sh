@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: https://github.com/img2tab/zippyshare
-# @Version: 201803200001
-# @Date: 2018-03-20
+# @Version: 201803210001
+# @Date: 2018-03-21
 # @Usage: sh zippyshare.sh url
 
 if [ -z "${1}" ]
@@ -61,12 +61,15 @@ function zippydownload()
         else
             a="$( grep -E 'var a = [0-9][^;]*' "${infofile}" | grep -o '[0-9][^;]*' -m 1)"
             b="$( grep -E '\.omg' "${infofile}" -m 1 | grep -o '[0-9][0-9]*)' | grep -o '[0-9][0-9]*')"
-        fi
-        if [ -n "${b}" ]
-        then
-            c="$( grep -E '\.omg' "${infofile}" -m 1 | grep -o 'substr([0-9][0-9]*' | grep -o '[0-9][0-9]*')"
-            b="$( echo -n $(( ${b} - ${c} )) )"
-            algorithm="$( echo -n $((${a}**3+${b})) )"
+            if [ -n "${b}" ]
+            then
+                c="$( grep -E '\.omg' "${infofile}" -m 1 | grep -o 'substr([0-9][0-9]*' | grep -o '[0-9][0-9]*')"
+                b="$( echo -n $(( ${b} - ${c} )) )"
+                algorithm="$( echo -n $((${a}**3+${b})) )"
+            else
+                echo "cound not get zippyshare url algorithm"
+                exit
+            fi
         fi
 
         a="$( echo $(( ${algorithm} )) )"
