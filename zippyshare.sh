@@ -33,7 +33,7 @@ function zippydownload()
         --keep-session-cookies \
         --save-cookies="${cookiefile}" \
         --quiet
-        filename="$( cat "${infofile}" | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
+        filename="$( cat "${infofile}" | grep "/d/" | cut -d'/' -f6 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
     done
 
     if [ "${retry}" -ge 10 ]
@@ -54,22 +54,13 @@ function zippydownload()
     if [ -f "${infofile}" ]
     then
         # Get url algorithm
-        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -m 1 -o '([0-9 \*%+\-]*)' | grep -m 1 -o '[0-9 \*%+\-]*' )"
+        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '([0-9]+%[0-9]+)' )"
         if [ -n "${dlbutton}" ]
         then
-           algorithm="${dlbutton}" 
+           algorithm="${dlbutton}+11"
         else
-            a="$( grep -E 'var a = [0-9][^;]*' "${infofile}" | grep -o '[0-9][^;]*' -m 1)"
-            b="$( grep -E '\.omg' "${infofile}" -m 1 | grep -o '[0-9][0-9]*)' | grep -o '[0-9][0-9]*')"
-            if [ -n "${b}" ]
-            then
-                c="$( grep -E '\.omg' "${infofile}" -m 1 | grep -o 'substr([0-9][0-9]*' | grep -o '[0-9][0-9]*')"
-                b="$( echo -n $(( ${b} - ${c} )) )"
-                algorithm="$( echo -n $((${a}**3+${b})) )"
-            else
-                echo "cound not get zippyshare url algorithm"
-                exit
-            fi
+           echo "cound not get zippyshare url algorithm"
+           exit
         fi
 
         a="$( echo $(( ${algorithm} )) )"
