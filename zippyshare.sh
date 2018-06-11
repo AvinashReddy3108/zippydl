@@ -54,7 +54,7 @@ function zippydownload()
     if [ -f "${infofile}" ]
     then
         # Get url algorithm
-        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '([0-9]+%[0-9]+)' )"
+        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '([0-9]+%[0-9]+)' | head -1 )"
         if [ -n "${dlbutton}" ]
         then
            algorithm="${dlbutton}+11"
