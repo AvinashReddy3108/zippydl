@@ -33,7 +33,7 @@ function zippydownload()
         --keep-session-cookies \
         --save-cookies="${cookiefile}" \
         --quiet
-        filename="$( cat "${infofile}" | grep "/d/" | cut -d'/' -f6 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
+        filename="$( cat "${infofile}" | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
     done
 
     if [ "${retry}" -ge 10 ]
@@ -54,12 +54,12 @@ function zippydownload()
     if [ -f "${infofile}" ]
     then
         # Get url algorithm
-        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '([0-9]+%[0-9]+)' | head -1 )"
+        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' )"
         if [ -n "${dlbutton}" ]
         then
-           algorithm="${dlbutton}+11"
+           algorithm="${dlbutton}"
         else
-           echo "cound not get zippyshare url algorithm"
+           echo "could not get zippyshare url algorithm"
            exit
         fi
 
