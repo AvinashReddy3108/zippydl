@@ -1,10 +1,10 @@
 #!/bin/bash
 # @Description: zippyshare.com file download script
 # @Author: Live2x
-# @URL: https://github.com/img2tab/zippyshare
-# @Version: 201803210001
-# @Date: 2018-03-21
-# @Usage: sh zippyshare.sh url
+# @URL: https://github.com/ffluegel/zippyshare
+# @Version: 201806250001
+# @Date: 2018-06-25
+# @Usage: ./zippyshare.sh url
 
 if [ -z "${1}" ]
 then
@@ -76,10 +76,10 @@ function zippydownload()
     fi
 
     # Build download url
-    dl="http://${server}/d/${id}/${a}/${filename}"
+    dl="https://${server}/d/${id}/${a}/${filename}"
 
-    # Set brower agent
-    agent="Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
+    # Set browser agent
+    agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"
 
     echo "${filename}"
 
