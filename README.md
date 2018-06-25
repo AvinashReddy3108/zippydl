@@ -3,17 +3,22 @@
 
 ##### Download single file from zippyshare
 
-    sh zippyshare.sh url
+```bash
+./zippyshare.sh url
+```
 
-##### Batch-download files from URL list:
+##### Batch-download files from URL list (url-list.txt must contain one zippyshare.com url per line)
 
-    sh zippyshare.sh url-list.txt     # url-list.txt must contain one zippyshare.com url per line
+```bash
+./zippyshare.sh url-list.txt
+```
 
-Example:
+##### Example:
 
-    sh zippyshare.sh http://www12.zippyshare.com/v/3456789/file.html  
+```bash
+./zippyshare.sh https://www12.zippyshare.com/v/3456789/file.html  
+```
 
 zippyshare.sh uses `wget` with the `--continue` flag, which skips over completed files and attempts to  resume partially downloaded files.
 
 ### Requirements: `coreutils`, `grep`, `sed`, `awk`, **`wget`**
-
