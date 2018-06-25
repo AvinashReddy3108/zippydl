@@ -16,9 +16,9 @@
 ##### Example:
 
 ```bash
-./zippyshare.sh https://www12.zippyshare.com/v/3456789/file.html  
+./zippyshare.sh https://www3.zippyshare.com/v/CDCi2wVT/file.html
 ```
 
-zippyshare.sh uses `wget` with the `--continue` flag, which skips over completed files and attempts to  resume partially downloaded files.
+zippyshare.sh uses `curl` with the `-C` flag, which skips over completed files and attempts to resume partially downloaded files.
 
-### Requirements: `coreutils`, `grep`, `sed`, `awk`, **`wget`**
+### Requirements: `coreutils`, `grep`, `sed`, **`curl`**
