@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: https://github.com/ffluegel/zippyshare
-# @Version: 201806250002
-# @Date: 2018-06-25
+# @Version: 201806270001
+# @Date: 2018-06-27
 # @Usage: ./zippyshare.sh url
 
 if [ -z "${1}" ]
@@ -28,7 +28,7 @@ function zippydownload()
         let retry+=1
         rm -f "${cookiefile}" 2> /dev/null
         rm -f "${infofile}" 2> /dev/null
-        curl -s -c "${cookiefile}" -o "${infofile}" "${url}"
+        curl -s -c "${cookiefile}" -o "${infofile}" -L "${url}"
         filename="$( cat "${infofile}" | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
     done
 
