@@ -35,7 +35,7 @@ function zippydownload()
     if [ "${retry}" -ge 10 ]
     then
         echo "could not download file"
-        exit
+        exit 1
     fi
 
     # Get cookie
@@ -44,7 +44,7 @@ function zippydownload()
         jsessionid="$( cat "${cookiefile}" | grep "JSESSIONID" | cut -f7)"
     else
         echo "can't find cookie file for ${prefix}"
-        exit
+        exit 1
     fi
 
     if [ -f "${infofile}" ]
@@ -56,7 +56,7 @@ function zippydownload()
            algorithm="${dlbutton}"
         else
            echo "could not get zippyshare url algorithm"
-           exit
+           exit 1
         fi
 
         a="$( echo $(( ${algorithm} )) )"
@@ -68,7 +68,7 @@ function zippydownload()
         id="$( echo "${ref}" | cut -d'/' -f5 )"
     else
         echo "can't find info file for ${prefix}"
-        exit
+        exit 1
     fi
 
     # Build download url
