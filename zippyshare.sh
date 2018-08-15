@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: https://github.com/ffluegel/zippyshare
-# @Version: 201806270001
-# @Date: 2018-06-27
+# @Version: 201808150001
+# @Date: 2018-08-15
 # @Usage: ./zippyshare.sh url
 
 if [ -z "${1}" ]
@@ -34,8 +34,10 @@ function zippydownload()
 
     if [ "${retry}" -ge 10 ]
     then
-        echo "could not download file"
-        exit 1
+        echo "could not download file from ${url}"
+        rm -f "${cookiefile}" 2> /dev/null
+        rm -f "${infofile}" 2> /dev/null
+        return 1
     fi
 
     # Get cookie
@@ -75,7 +77,7 @@ function zippydownload()
     dl="https://${server}/d/${id}/${a}/${filename}"
 
     # Set browser agent
-    agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"
+    agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
 
     echo "${filename}"
 
