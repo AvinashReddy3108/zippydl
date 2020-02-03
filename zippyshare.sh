@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: https://github.com/ffluegel/zippyshare
-# @Version: 201907080001
-# @Date: 2019-07-08
+# @Version: 202002030001
+# @Date: 2020-02-03
 # @Usage: ./zippyshare.sh url
 
 if [ -z "${1}" ]
@@ -52,10 +52,10 @@ function zippydownload()
     if [ -f "${infofile}" ]
     then
         # Get url algorithm
-        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' )"
+        dlbutton="$( grep -oE 'var a = [0-9]+%[0-9]+;' ${infofile} | grep -oE '[0-9]+' | head -1 )"
         if [ -n "${dlbutton}" ]
         then
-           algorithm="${dlbutton}"
+           algorithm="(${dlbutton}%900)*(${dlbutton}%53)+8+(${dlbutton}%13)"
         else
            echo "could not get zippyshare url algorithm"
            exit 1
@@ -77,7 +77,7 @@ function zippydownload()
     dl="https://${server}/d/${id}/${a}/${filename}"
 
     # Set browser agent
-    agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"
+    agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36"
 
     echo "${filename}"
 
