@@ -55,10 +55,16 @@ function zippydownload()
         dlbutton="$( grep -oE 'var a = [0-9]+%[0-9]+;' ${infofile} | grep -oE '[0-9]+' | head -1 )"
         if [ -n "${dlbutton}" ]
         then
-           algorithm="(${dlbutton}%900)*(${dlbutton}%53)+8+(${dlbutton}%13)"
+	        algorithm="(${dlbutton}%900)*(${dlbutton}%53)+8+(${dlbutton}%13)"
         else
-           echo "could not get zippyshare url algorithm"
-           exit 1
+	        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' )"
+	        if [ -n "${dlbutton}" ]
+	        then
+		        algorithm="${dlbutton}"
+	        else
+                echo "could not get zippyshare url algorithm"
+                exit 1
+	        fi
         fi
 
         a="$( echo $(( ${algorithm} )) )"
