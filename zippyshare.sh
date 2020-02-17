@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: https://github.com/ffluegel/zippyshare
-# @Version: 202002030001
-# @Date: 2020-02-03
+# @Version: 202002170001
+# @Date: 2020-02-17
 # @Usage: ./zippyshare.sh url
 
 if [ -z "${1}" ]
@@ -52,10 +52,10 @@ function zippydownload()
     if [ -f "${infofile}" ]
     then
         # Get url algorithm
-        dlbutton="$( grep -oE 'var a = [0-9]+%[0-9]+;' ${infofile} | grep -oE '[0-9]+' | head -1 )"
+        dlbutton="$( grep -oE 'var b = [0-9]+' ${infofile} | grep -oE '[0-9]+'  )"
         if [ -n "${dlbutton}" ]
         then
-	        algorithm="(${dlbutton}%900)*(${dlbutton}%53)+8+(${dlbutton}%13)"
+	        algorithm="6+${dlbutton}"
         else
 	        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' )"
 	        if [ -n "${dlbutton}" ]
@@ -67,7 +67,7 @@ function zippydownload()
 	        fi
         fi
 
-        a="$( echo $(( ${algorithm} )) )"
+        a="$( echo $(( ${algorithm} )) )3"
         # Get ref, server, id
         ref="$( cat "${infofile}" | grep 'property="og:url"' | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
 
@@ -83,7 +83,7 @@ function zippydownload()
     dl="https://${server}/d/${id}/${a}/${filename}"
 
     # Set browser agent
-    agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36"
+    agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36"
 
     echo "${filename}"
 
