@@ -56,18 +56,19 @@ function zippydownload()
         if [ -n "${dlbutton}" ]
         then
 	        algorithm="6+${dlbutton}"
+		a="$( echo $(( ${algorithm} )) )3"
         else
 	        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' )"
 	        if [ -n "${dlbutton}" ]
 	        then
 		        algorithm="${dlbutton}"
+			a="$( echo $(( ${algorithm} )) )"
 	        else
                 echo "could not get zippyshare url algorithm"
                 exit 1
 	        fi
         fi
 
-        a="$( echo $(( ${algorithm} )) )3"
         # Get ref, server, id
         ref="$( cat "${infofile}" | grep 'property="og:url"' | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
 
