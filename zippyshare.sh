@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Live2x
 # @URL: https://github.com/ffluegel/zippyshare
-# @Version: 202011270002
-# @Date: 2020-11-27
+# @Version: 202103170001
+# @Date: 2021-03-17
 # @Usage: ./zippyshare.sh url
 
 if [ -z "${1}" ]
@@ -55,7 +55,7 @@ function zippydownload()
         dlbutton="$( grep -oE 'var a = [0-9]+' ${infofile} | grep -oE '[0-9]+'  )"
         if [ -n "${dlbutton}" ]
         then
-	        algorithm="${dlbutton}**3+3"
+	        algorithm="${dlbutton}/3+${dlbutton}"
 		a="$( echo $(( ${algorithm} )) )"
         else
 	        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' )"
