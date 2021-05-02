@@ -86,6 +86,11 @@ function zippydownload()
     # Set browser agent
     agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36"
 
+    #Rename file output
+    if [ "${outputName}" != "" ]; then
+        filename="${outputName}"
+    fi
+    
     echo "${filename}"
 
     # Start download file
@@ -103,5 +108,6 @@ then
     done
 else
     url="${1}"
-    zippydownload "${url}"
+    outputName="${2}"
+    zippydownload "${url}" "${outputName}"
 fi
