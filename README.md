@@ -19,6 +19,6 @@
 ./zippyshare.sh https://www3.zippyshare.com/v/CDCi2wVT/file.html
 ```
 
-zippyshare.sh uses `curl` with the `-C` flag, which skips over completed files and attempts to resume partially downloaded files.
+zippyshare.sh uses `aria2c` with the `--continue=true` flag, which skips over completed files and attempts to resume partially downloaded files.
 
-### Requirements: `coreutils`, `grep`, `sed`, **`curl`**
+### Requirements: `aria2c`, `curl`, `grep`, `awk`
