@@ -1,7 +1,9 @@
-#!/bin/bash
-# @Description: zippyshare.com file download script
-# @URL: https://github.com/ffluegel/zippyshare
-# @Usage: ./zippyshare.sh url
+#!/usr/bin/env bash
+
+# zippyshare.com batch downloader
+# Usage: ./zippyshare.sh url (or) ./zippyshare.sh url-list.txt
+# Requires: aria2c, curl, grep, awk
+# Credits: AvinashReddy3108, TheGlockMisc, ffluegel
 
 if [ -z "${1}" ]; then
     echo "usage: ${0} url"
@@ -10,89 +12,54 @@ if [ -z "${1}" ]; then
     exit
 fi
 
+trap 'exit' SIGINT
+trap 'exit' SIGTERM
+
+function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
+function pepper() { x="$1"; n="$(( x % 2 ))"; b="$(( x % 3 ))"; z="$x" }
+
 function zippydownload() {
-    prefix="$(echo -n "${url}" | cut -c "11,12,31-38" | sed -e 's/[^a-zA-Z0-9]//g')"
-    cookiefile="${prefix}-cookie.tmp"
-    infofile="${prefix}-info.tmp"
+    baseDomain=$(echo "${url}" | awk -F[/:] '{print $4}')
+    rawData=$(curl -L "${url}")
 
-    # loop that makes sure the script actually finds a filename
-    filename=""
-    retry=0
-    while [ -z "${filename}" -a ${retry} -lt 10 ]; do
-        let retry+=1
-        rm -f "${cookiefile}" 2>/dev/null
-        rm -f "${infofile}" 2>/dev/null
-        curl -s -c "${cookiefile}" -o "${infofile}" -L "${url}"
-        filename="$(cat "${infofile}" | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*")"
-    done
+    salt=$(echo "$rawData" | grep -E "var b =" | sed 's/^.*=[[:space:]]//g;s/%.*//g')
+    [ -z "$salt" ] && ( echo "Could not download file from ${url}"; exit 1 )
 
-    if [ "${retry}" -ge 10 ]; then
-        echo "could not download file from ${url}"
-        rm -f "${cookiefile}" 2>/dev/null
-        rm -f "${infofile}" 2>/dev/null
-        return 1
-    fi
+    pepper "$salt"; secret="$(( n + b + z ))"
 
-    # Get cookie
-    if [ -f "${cookiefile}" ]; then
-        jsessionid="$(cat "${cookiefile}" | grep "JSESSIONID" | cut -f7)"
-    else
-        echo "can't find cookie file for ${prefix}"
-        exit 1
-    fi
+    sauce=$(echo "$rawData" | grep "document.getElementById('dlbutton').href")
+    d=$(echo "$sauce" | awk -F['"'] '{print $2}'); suffix=$(echo "$sauce" | awk -F['"'] '{print $4}')
 
-    if [ -f "${infofile}" ]; then
-        # Get url algorithm
-        dlbutton="$(grep -oE 'var a = [0-9]+' ${infofile} | grep -oE '[0-9]+')"
-        if [ -n "${dlbutton}" ]; then
-            algorithm="${dlbutton}/3+${dlbutton}"
-            a="$(echo $((${algorithm})))"
-        else
-            dlbutton="$(grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)')"
-            if [ -n "${dlbutton}" ]; then
-                algorithm="${dlbutton}"
-                a="$(echo $((${algorithm})))"
-            else
-                echo "could not get zippyshare url algorithm"
-                exit 1
-            fi
-        fi
+    dl="https://${baseDomain}${d}${secret}${suffix}"
 
-        # Get ref, server, id
-        ref="$(cat "${infofile}" | grep 'property="og:url"' | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*")"
-        server="$(echo "${ref}" | cut -d'/' -f3)"
-        id="$(echo "${ref}" | cut -d'/' -f5)"
-    else
-        echo "can't find info file for ${prefix}"
-        exit 1
-    fi
+    # Custom destination filename
+    [ -n "${outputName}" ] && filename="${outputName}" || filename=$(echo "$suffix" | tr -d '/')
 
-    # Build download url
-    dl="https://${server}/d/${id}/${a}/${filename}"
-
-    # Set browser agent
-    agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36"
-
-    #Rename file output
-    if [ -n "${outputName}" ]; then
-        filename="${outputName}"
-    fi
-
-    echo "${filename}"
+    echo -e "[downloading] `urldecode $dl` -> `urldecode $filename`"
 
     # Start download file
-    curl -# -A "${agent}" -e "${ref}" -H "Cookie: JSESSIONID=${jsessionid}" -C - "${dl}" -o "${filename}"
+    aria2c \
+    --content-disposition-default-utf8=true --continue=true \
+    --summary-interval=0 --download-result=hide --console-log-level=warn \
+    --max-connection-per-server=16 --min-split-size=1M --split=8 \
+    --connect-timeout=30 --retry-wait=2 \
+    "${dl}" --out="`urldecode "${filename}"`"
 
-    rm -f "${cookiefile}" 2>/dev/null
-    rm -f "${infofile}" 2>/dev/null
+    echo -e "\033[1K"
 }
 
 if [ -f "${1}" ]; then
-    for url in $(cat "${1}" | grep -i 'zippyshare.com'); do
-        zippydownload "${url}"
+    links=()
+    while IFS="\n" read -r link || [[ "$link" ]]; do
+        [[ $link == *"zippyshare.com"* ]] && links+=("$link")
+    done < "${1}"
+
+    current=0; total=${#links[@]}
+    for url in "${links[@]}"; do
+        current=$((current + 1))
+        echo "Downloading [$current/$total], please wait.."; zippydownload "${url}"
     done
 else
-    url="${1}"
-    outputName="${2}"
+    url="${1}"; outputName="${2}"
     zippydownload "${url}" "${outputName}"
 fi
