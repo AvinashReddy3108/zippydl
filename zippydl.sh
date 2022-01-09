@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # zippyshare.com batch downloader
-# Usage: ./zippyshare.sh url (or) ./zippyshare.sh url-list.txt
+# Usage: ./zippydl.sh url (or) ./zippydl.sh url-list.txt
 # Requires: aria2, curl, grep, awk
 # Credits: AvinashReddy3108, TheGlockMisc, ffluegel
 
