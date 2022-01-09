@@ -16,7 +16,7 @@ trap 'exit' SIGINT
 trap 'exit' SIGTERM
 
 function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
-function pepper() { x="$1"; n="$(( x % 2 ))"; b="$(( x % 3 ))"; z="$x" }
+function pepper() { x="$1"; n="$(( x % 2 ))"; b="$(( x % 3 ))"; z="$x"; }
 
 function zippydownload() {
     baseDomain=$(echo "${url}" | awk -F[/:] '{print $4}')
@@ -35,7 +35,7 @@ function zippydownload() {
     # Custom destination filename
     [ -n "${outputName}" ] && filename="${outputName}" || filename=$(echo "$suffix" | tr -d '/')
 
-    echo -e "[downloading] `urldecode $dl` -> `urldecode $filename`"
+    echo -e "[downloading] $(urldecode "$dl") -> $(urldecode "$filename")"
 
     # Start download file
     aria2c \
@@ -43,7 +43,7 @@ function zippydownload() {
     --summary-interval=0 --download-result=hide --console-log-level=warn \
     --max-connection-per-server=16 --min-split-size=1M --split=8 \
     --connect-timeout=30 --retry-wait=2 \
-    "${dl}" --out="`urldecode "${filename}"`"
+    "${dl}" --out="$(urldecode "${filename}")"
 
     echo -e "\033[1K"
 }
