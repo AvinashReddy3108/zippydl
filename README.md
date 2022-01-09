@@ -21,4 +21,4 @@
 
 zippyshare.sh uses `aria2c` with the `--continue=true` flag, which skips over completed files and attempts to resume partially downloaded files.
 
-### Requirements: `aria2c`, `curl`, `grep`, `awk`
+### Requirements: `aria2`, `curl`, `grep`, `awk`
