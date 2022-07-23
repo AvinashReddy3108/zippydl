@@ -2,7 +2,7 @@
 
 # zippyshare.com batch downloader
 # Usage: ./zippydl.sh url (or) ./zippydl.sh url-list.txt
-# Requires: aria2, curl, grep, awk
+# Requires: aria2, curl, grep, sed
 # Credits: AvinashReddy3108, TheGlockMisc, ffluegel
 
 if [ -z "${1}" ]; then
@@ -15,21 +15,42 @@ fi
 trap 'exit' SIGINT; trap 'exit' SIGTERM
 
 function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
-function downloader() { aria2c --content-disposition-default-utf8=true --continue=true --summary-interval=0 --download-result=hide --console-log-level=warn --max-connection-per-server=16 --min-split-size=1M --split=8 --connect-timeout=30 --retry-wait=2 "$@"; }
+function downloader() {
+    aria2c \
+        --content-disposition-default-utf8=true \
+        --continue=true \
+        --summary-interval=0 \
+        --download-result=hide \
+        --console-log-level=warn \
+        --max-connection-per-server=16 \
+        --min-split-size=1M \
+        --split=8 \
+        --connect-timeout=30 \
+        --retry-wait=2 \
+        "$@";
+}
 
 function zippyget() {
-    baseDomain=$(echo "${url}" | awk -F[/:] '{print $4}')
+    rawData="$(curl -sL \
+        --connect-timeout 5 \
+        --max-time 10 \
+        --retry 5 \
+        --retry-delay 0 \
+        --retry-max-time 15 \
+        "${url}" | sed -nE 's_.*document.getElementById.*dl.*.href.*"(/d/[^\"]*)"\+\(([^\+]*)+.*"([^\"]*)"\;_\1#\2+11#\3_p')"
 
-    rawData=$(curl -sL --connect-timeout 5 --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 15 "${url}")
+    salt="${rawData#*#}"; [ -z "$salt" ] && local status='fail' || local status='pass'
 
-    salt=$(echo "$rawData" | grep "document.getElementById('dlbutton').href" | grep -oP '\([0-9](.*?)\)' | awk '{print "$("$0")"}')
-    [ -z "$salt" ] && local status='fail' || local status='pass'
+    if printf '%s' "${salt%%#*}" | grep -qE '^([0-9\-\+\*%/ ]*)$'; then
+        salt="$((${salt%%#*}))"
+    else
+        local status='fail'
+    fi
 
-    secret="$(eval echo "$salt")"; sauce=$(echo "$rawData" | grep "document.getElementById('dlbutton').href")
+    pepper="${url%%/v/*}$(printf '%s' "${rawData}" | sed -E "s_\#(.*?)\#_${salt}_g")"
 
-    d=$(echo "$sauce" | awk -F['"'] '{print $2}'); suffix=$(echo "$sauce" | awk -F['"'] '{print $4}')
+    dl="$(echo $pepper)"; filename="$(urldecode "$(echo "${pepper##*/}" | sed 's|/||g')")"
 
-    dl="https://${baseDomain}${d}${secret}${suffix}"; filename="$(urldecode "$(echo "$suffix" | sed 's|/||g')")"
     result=("$status" "$dl" "$filename"); echo "${result[@]}"
 }
 
@@ -51,7 +72,7 @@ if [ -f "${1}" ]; then
 
     downloader --input-file="$tmp"
 else
-    url="${1}"; dl=($(zippyget "${url}"));
+    url="${1}"; dl=("$(zippyget "${url}")");
     [ "${dl[0]}" != 'pass' ] && echo "Could not download from '${url}', maybe the file does not exist?" && exit 1 || downloader "${dl[1]}" --out="$(urldecode "${dl[2]}")"
 fi
 
